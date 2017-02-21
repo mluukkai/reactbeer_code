@@ -1,4 +1,14 @@
 import React, { Component } from 'react';
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  Container
+} from 'reactstrap';
 
 class App extends Component {
   constructor() {
@@ -30,13 +40,14 @@ class App extends Component {
   
     return (
       <div>
-        <h1>Reactbeer</h1>
-          <Header 
-            beers={this.setVisible("BeersPage").bind(this)}
-            styles={this.setVisible("StylesPage").bind(this)}
-            login={this.setVisible("LoginPage").bind(this)}
-          />
+        <Header 
+          beers={this.setVisible("BeersPage").bind(this)}
+          styles={this.setVisible("StylesPage").bind(this)}
+          login={this.setVisible("LoginPage").bind(this)}
+        />
+        <Container>
           {visiblePageComponent()}
+        </Container>
       </div>
     );
   }
@@ -48,11 +59,23 @@ class Header extends React.Component {
   }
   render(){
     return (
-      <div>
-        <a href="#" onClick={this.props.beers}>Beers</a>
-        <a href="#" onClick={this.props.styles}>Styles</a>
-        <a href="#" onClick={this.props.login}>Login</a>
-      </div>
+        <Navbar color="faded" light toggleable>
+          <NavbarToggler right onClick={this.toggle} />
+          <NavbarBrand href="/">reactbeer</NavbarBrand>
+          <Collapse navbar>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink href="#" onClick={this.props.beers}>Beers</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="#" onClick={this.props.styles}>Styles</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="#" onClick={this.props.login}>Login</NavLink>
+              </NavItem>              
+            </Nav>
+          </Collapse>
+        </Navbar>      
     )
   }
 }
