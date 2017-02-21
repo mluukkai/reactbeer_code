@@ -7,16 +7,29 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Container
+  Container,
+  Table
 } from 'reactstrap';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      visible: "StylesPage"
+      visible: "StylesPage",
+      styles: []
     }
   }
+
+  componentWillMount() {
+    fetch('http://localhost:3001/styles.json')
+     .then( response => response.json() )
+     .then( results => {
+        console.log(results)
+        this.setState({
+          styles: results
+        })
+     })
+  }  
 
   setVisible(componentName) {
     return (e) => {
@@ -32,7 +45,7 @@ class App extends Component {
       if ( this.state.visible=="BeersPage" ) {
         return <BeersPage />
       } else if ( this.state.visible=="StylesPage" ) {
-        return <StylesPage />
+        return <StylesPage styles={this.state.styles}/>
       } else  {
         return <LoginPage />
       }     
@@ -92,13 +105,31 @@ class BeersPage extends React.Component {
 
 class StylesPage extends React.Component {
   render(){
+    let styles = this.props.styles
     return (
       <div>
-        <h2>Styles</h2>
+        <h2>Styles</h2>  
+        <Table striped>
+          <thead>
+            <tr>
+              <th>name</th>
+              <th>description</th>
+            </tr>
+          </thead>
+          <tbody>
+            { styles.map(s => <Style key={s.id} style={s}/> ) }    
+          </tbody>
+        </Table>  
       </div>
     )
   }
 }
+
+const Style = (props) => 
+  <tr>
+    <td>{props.style.name}</td>
+    <td>{props.style.description}</td>
+  </tr> 
 
 class LoginPage extends React.Component {
   render(){
