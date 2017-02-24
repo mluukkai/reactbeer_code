@@ -8,7 +8,13 @@ import {
   NavItem,
   NavLink,
   Container,
-  Table
+  Table,
+  Button, 
+  Form, 
+  FormGroup, 
+  Label, 
+  Input, 
+  FormText
 } from 'reactstrap';
 
 class App extends Component {
@@ -40,12 +46,21 @@ class App extends Component {
     }
   }
 
+  addStyle(style) {
+    this.state.styles.push(style)
+    this.setState({
+      styles: this.state.styles
+    })      
+  }
+
   render() {
     let visiblePageComponent = () => { 
       if ( this.state.visible=="BeersPage" ) {
         return <BeersPage />
       } else if ( this.state.visible=="StylesPage" ) {
-        return <StylesPage styles={this.state.styles}/>
+        return <StylesPage 
+                styles={this.state.styles} 
+                addStyle={this.addStyle.bind(this)}/>
       } else  {
         return <LoginPage />
       }     
@@ -109,6 +124,7 @@ class StylesPage extends React.Component {
     return (
       <div>
         <h2>Styles</h2>  
+        <NewBeerForm addStyle={this.props.addStyle}/>
         <Table striped>
           <thead>
             <tr>
@@ -130,6 +146,77 @@ const Style = (props) =>
     <td>{props.style.name}</td>
     <td>{props.style.description}</td>
   </tr> 
+
+class NewBeerForm extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      visible: false
+    }
+  }
+
+  toggleVisible() {
+    this.setState({
+      visible: !this.state.visible
+    })
+  }
+
+  createStyle(e) {
+    e.preventDefault()
+    let form = e.target;
+
+    let data = {
+      name: form.elements['name'].value,
+      description: form.elements['description'].value
+    }
+
+    let request = {
+      method: 'POST', 
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
+
+    fetch('http://localhost:3001/styles.json', request)
+     .then( response => response.json() )
+     .then( response => {
+        console.log(response)
+        this.toggleVisible()
+        this.props.addStyle(response)
+     })
+  }
+
+  render(){
+    let visibleComponent = () => { 
+      if ( this.state.visible ) {
+        return (
+          <Form onSubmit={this.createStyle.bind(this)}>
+           <FormGroup>
+            <Label for="exampleEmail">Name</Label>
+            <Input type="text" name="name" id="name"/>
+          </FormGroup>
+          <FormGroup>
+            <Label for="exampleText">Description</Label>
+            <Input type="textarea" name="description" id="description"  />
+          </FormGroup>
+          <Button color="primary">Create style</Button>
+          <Button color="warning" onClick={this.toggleVisible.bind(this)}>Cancel</Button>
+        </Form>
+        )
+      } else {
+        return <Button color="primary" onClick={this.toggleVisible.bind(this)}>Create new style</Button>
+      }    
+    }
+
+    return (
+      <div>
+        {visibleComponent()}
+      </div>
+    )
+  }
+}
 
 class LoginPage extends React.Component {
   render(){
