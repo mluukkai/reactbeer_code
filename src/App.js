@@ -54,9 +54,9 @@ class App extends Component {
     return (
       <div>
         <Header 
-          beers={this.setVisible("BeersPage").bind(this)}
-          styles={this.setVisible("StylesPage").bind(this)}
-          login={this.setVisible("LoginPage").bind(this)}
+          showBeers={this.setVisible("BeersPage").bind(this)}
+          showStyles={this.setVisible("StylesPage").bind(this)}
+          showLogin={this.setVisible("LoginPage").bind(this)}
         />
         <Container>
           {visiblePageComponent()}
@@ -78,13 +78,13 @@ class Header extends React.Component {
           <Collapse navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink href="#" onClick={this.props.beers}>Beers</NavLink>
+                <NavLink href="#" onClick={this.props.showBeers}>Beers</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="#" onClick={this.props.styles}>Styles</NavLink>
+                <NavLink href="#" onClick={this.props.showStyles}>Styles</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="#" onClick={this.props.login}>Login</NavLink>
+                <NavLink href="#" onClick={this.props.showLogin}>Login</NavLink>
               </NavItem>              
             </Nav>
           </Collapse>
