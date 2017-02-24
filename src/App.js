@@ -183,7 +183,7 @@ class NewBeerForm extends React.Component {
       if (response.status >= 200 && response.status < 300) {  
         return Promise.resolve(response)  
       } else {  
-        return Promise.reject(response)  
+        response.json().then( data => Promise.reject(data) ) 
       }  
     }
 
@@ -194,10 +194,8 @@ class NewBeerForm extends React.Component {
         console.log(response)
         this.toggleVisible()
         this.props.addStyle(response)
-     }).catch(function(response) {
-        response.json().then( data => {
-          console.log(data)
-        })
+     }).catch(function(error) {
+       console.log(error)
      }); 
   }
 
