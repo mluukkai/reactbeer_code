@@ -183,13 +183,13 @@ class NewBeerForm extends React.Component {
       if (response.status >= 200 && response.status < 300) {  
         return Promise.resolve(response)  
       } else {  
-        response.json().then( data => Promise.reject(data) ) 
+        return response.json().then( data => Promise.reject(data) ) 
       }  
     }
 
     fetch('http://localhost:3001/styles.json', request)
      .then( status )
-     .then( response => { debugger; return response.json()} )
+     .then( response => { response.json } )
      .then( response => {
         console.log(response)
         this.toggleVisible()
