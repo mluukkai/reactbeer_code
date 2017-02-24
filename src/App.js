@@ -179,8 +179,8 @@ class NewBeerForm extends React.Component {
       body: JSON.stringify(data)
     };
 
-    let status = (response) => { 
-      if (response.status >= 200 && response.status < 300) {  
+    let ensureSuccess = (response) => { 
+      if (response.status == 201) {  
         return Promise.resolve(response)  
       } else {  
         return response.json().then( data => Promise.reject(data) ) 
@@ -188,13 +188,13 @@ class NewBeerForm extends React.Component {
     }
 
     fetch('http://localhost:3001/styles.json', request)
-     .then( status )
-     .then( response => { response.json } )
+     .then( ensureSuccess )
+     .then( response => response.json() )
      .then( response => {
         console.log(response)
         this.toggleVisible()
         this.props.addStyle(response)
-     }).catch(function(error) {
+     }).catch( error => {
        console.log(error)
      }); 
   }
