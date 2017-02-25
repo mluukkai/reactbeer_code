@@ -13,16 +13,18 @@ import {
   Form, 
   FormGroup, 
   Label, 
-  Input, 
-  FormText
+  Input,
+  Alert
 } from 'reactstrap';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      visible: "StylesPage",
-      styles: []
+      visible: "LoginPage",
+      styles: [],
+      username: '',
+      token: ''
     }
   }
 
@@ -46,6 +48,14 @@ class App extends Component {
     }
   }
 
+  setTokenAndUser(token, username) {
+    this.setState({
+      token: token,
+      username: username,
+      visible: 'WelcomePage'
+    })   
+  }
+
   addStyle(style) {
     this.state.styles.push(style)
     this.setState({
@@ -55,15 +65,19 @@ class App extends Component {
 
   render() {
     let visiblePageComponent = () => { 
+      console.log(this.state.visible)
       if ( this.state.visible=="BeersPage" ) {
         return <BeersPage />
       } else if ( this.state.visible=="StylesPage" ) {
         return <StylesPage 
                 styles={this.state.styles} 
-                addStyle={this.addStyle.bind(this)}/>
-      } else  {
-        return <LoginPage />
-      }     
+                addStyle={this.addStyle.bind(this)}
+                token={this.state.token}/>
+      } else if ( this.state.visible=="LoginPage" )  {
+        return <LoginPage setTokenAndUser={this.setTokenAndUser.bind(this)}/>
+      } else {
+        return <WelcomePage username={this.state.username} />
+      }    
     }
   
     return (
@@ -124,7 +138,7 @@ class StylesPage extends React.Component {
     return (
       <div>
         <h2>Styles</h2>  
-        <NewBeerForm addStyle={this.props.addStyle}/>
+        <NewBeerForm addStyle={this.props.addStyle} token={this.props.token}/>
         <Table striped>
           <thead>
             <tr>
@@ -174,7 +188,8 @@ class NewBeerForm extends React.Component {
       method: 'POST', 
       mode: 'cors',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': this.props.token,
       },
       body: JSON.stringify(data)
     };
@@ -205,11 +220,11 @@ class NewBeerForm extends React.Component {
         return (
           <Form onSubmit={this.createStyle.bind(this)}>
            <FormGroup>
-            <Label for="exampleEmail">Name</Label>
+            <Label for="name">Name</Label>
             <Input type="text" name="name" id="name"/>
           </FormGroup>
           <FormGroup>
-            <Label for="exampleText">Description</Label>
+            <Label for="description">Description</Label>
             <Input type="textarea" name="description" id="description"  />
           </FormGroup>
           <Button color="primary">Create style</Button>
@@ -230,13 +245,69 @@ class NewBeerForm extends React.Component {
 }
 
 class LoginPage extends React.Component {
+  login(e) {
+    e.preventDefault()
+    let form = e.target;
+
+    let data = {
+      username: form.elements['username'].value,
+      password: form.elements['password'].value
+    }
+
+    let request = {
+      method: 'POST', 
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
+
+    let ensureSuccess = (response) => { 
+      if (response.status == 200) {  
+        return Promise.resolve(response)  
+      } else {  
+        return response.json().then( data => Promise.reject(data) ) 
+      }  
+    }
+
+    fetch('http://localhost:3001/login_api', request)
+     .then( ensureSuccess )
+     .then( response => response.json() )
+     .then( response => {
+        console.log(response)
+        window.r = response
+        form.elements['username'].value = ""
+        form.elements['password'].value = ""   
+        this.props.setTokenAndUser(response.token, data.username)
+     }).catch( error => {
+       console.log(error)
+     });   
+  }
+
   render(){
     return (
       <div>
-        <h2>Login</h2>
+        <Form onSubmit={this.login.bind(this)}>
+          <FormGroup>
+            <Label for="username">username</Label>
+            <Input type="text" name="username" id="username" />
+          </FormGroup>
+          <FormGroup>
+            <Label for="password">password</Label>
+            <Input type="password" name="password" id="password" />
+          </FormGroup>
+          <Button color="primary">Login</Button>
+        </Form>
       </div>
     )
   }
 }
+
+const WelcomePage = (props) => 
+  <Alert color="success">
+    Welcome back {props.username}
+  </Alert>     
 
 export default App;
