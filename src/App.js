@@ -17,27 +17,29 @@ import {
   Alert
 } from 'reactstrap';
 
+import ApiService from './ApiService';
+
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      visible: "LoginPage",
+      visible: "StylesPage",
       styles: [],
       username: '',
       token: ''
     }
   }
 
+  setStyles(styles) {
+    this.setState({
+      styles: styles
+    })
+  }
+
   componentWillMount() {
-    fetch('https://murmuring-scrubland-16064.herokuapp.com/styles.json')
-     .then( response => response.json() )
-     .then( results => {
-        console.log(results)
-        this.setState({
-          styles: results
-        })
-     })
-  }  
+    ApiService.instance().styles()
+     .then( results => this.setStyles(results)) 
+  } 
 
   setVisible(componentName) {
     return (e) => {
@@ -49,6 +51,7 @@ class App extends Component {
   }
 
   setTokenAndUser(token, username) {
+    ApiService.instance().setToken(token)
     this.setState({
       token: token,
       username: username,
@@ -96,9 +99,6 @@ class App extends Component {
 }
 
 class Header extends React.Component {
-  constructor() {
-    super();
-  }
   render(){
     return (
         <Navbar color="faded" light toggleable>
@@ -184,27 +184,7 @@ class NewBeerForm extends React.Component {
       description: form.elements['description'].value
     }
 
-    let request = {
-      method: 'POST', 
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.props.token,
-      },
-      body: JSON.stringify(data)
-    };
-
-    let ensureSuccess = (response) => { 
-      if (response.status == 201) {  
-        return Promise.resolve(response)  
-      } else {  
-        return response.json().then( data => Promise.reject(data) ) 
-      }  
-    }
-
-    fetch('https://murmuring-scrubland-16064.herokuapp.com/styles.json', request)
-     .then( ensureSuccess )
-     .then( response => response.json() )
+    ApiService.instance().createStyle(data)
      .then( response => {
         console.log(response)
         this.toggleVisible()
@@ -254,27 +234,7 @@ class LoginPage extends React.Component {
       password: form.elements['password'].value
     }
 
-    let request = {
-      method: 'POST', 
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(data)
-    };
-
-    let ensureSuccess = (response) => { 
-      if (response.status == 200) {  
-        return Promise.resolve(response)  
-      } else {  
-        return response.json().then( data => Promise.reject(data) ) 
-      }  
-    }
-
-    fetch('https://murmuring-scrubland-16064.herokuapp.com/login_api', request)
-     .then( ensureSuccess )
-     .then( response => response.json() )
+    ApiService.instance().login(data)
      .then( response => {
         console.log(response)
         window.r = response
