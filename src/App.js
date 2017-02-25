@@ -29,7 +29,7 @@ class App extends Component {
   }
 
   componentWillMount() {
-    fetch('http://localhost:3001/styles.json')
+    fetch('https://murmuring-scrubland-16064.herokuapp.com/styles.json')
      .then( response => response.json() )
      .then( results => {
         console.log(results)
@@ -202,7 +202,7 @@ class NewBeerForm extends React.Component {
       }  
     }
 
-    fetch('http://localhost:3001/styles.json', request)
+    fetch('https://murmuring-scrubland-16064.herokuapp.com/styles.json', request)
      .then( ensureSuccess )
      .then( response => response.json() )
      .then( response => {
@@ -272,7 +272,7 @@ class LoginPage extends React.Component {
       }  
     }
 
-    fetch('http://localhost:3001/login_api', request)
+    fetch('https://murmuring-scrubland-16064.herokuapp.com/login_api', request)
      .then( ensureSuccess )
      .then( response => response.json() )
      .then( response => {
