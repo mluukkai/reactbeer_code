@@ -19,8 +19,6 @@ class LoginPage extends React.Component {
       password: form.elements['password'].value
     }
 
-    data = { username: "mluukkai", password: "Mluukkai1"}
-
     ApiService.instance().login(data)
      .then( response => {
         console.log(response)
